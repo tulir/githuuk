@@ -17,6 +17,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"maunium.net/go/githuuk"
@@ -54,6 +55,8 @@ func main() {
 			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Hook.Name, evt.Hook.ID)
 		default:
 			fmt.Println("Unknown event type", rawEvent.GetType())
+			data, _ := json.MarshalIndent(rawEvent, "", "  ")
+			fmt.Println(string(data))
 		}
 	}
 }
