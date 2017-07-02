@@ -72,7 +72,7 @@ type PullRequestEvent struct {
 // CreateEvent contains the data in a create (branch/tag) webhook event.
 type CreateEvent struct {
 	BaseEvent
-	Type         ReferenceType `json:"ref_type"`
+	RefType      ReferenceType `json:"ref_type"`
 	Ref          Reference     `json:"ref"`
 	MasterBranch string        `json:"master_branch"`
 	Description  string        `json:"description"`
@@ -81,6 +81,6 @@ type CreateEvent struct {
 // DeleteEvent contains the data in a delete (branch/tag) webhook event.
 type DeleteEvent struct {
 	BaseEvent
-	Type ReferenceType `json:"ref_type"`
-	Ref  Reference     `json:"ref"`
+	RefType ReferenceType `json:"ref_type"`
+	Ref     Reference     `json:"ref"`
 }
