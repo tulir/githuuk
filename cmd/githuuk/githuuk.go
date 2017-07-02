@@ -47,11 +47,11 @@ func main() {
 	for rawEvent := range server.Events {
 		switch evt := rawEvent.(type) {
 		case *githuuk.PushEvent:
-			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
+			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
 		case *githuuk.PullRequestEvent:
-			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Action, evt.NumberOfChanges)
+			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Action, evt.NumberOfChanges)
 		case *githuuk.PingEvent:
-			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Hook.Name, evt.Hook.ID)
+			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Hook.Name, evt.Hook.ID)
 		default:
 			fmt.Println("Unknown event type", rawEvent.GetType())
 		}

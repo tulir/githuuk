@@ -54,13 +54,17 @@ type Repository struct {
 	MasterBranch  string `json:"master_branch"`
 }
 
-// User represents a basic name+email user.
+// User represents a GitHub user.
 type User struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Login      string `json:"login"`
+	ID         int    `json:"id"`
+	AvatarURL  string `json:"avatar_url"`
+	GravatarID string `json:"gravatar_id"`
+	Type       string `json:"type"`
+	Admin      bool   `json:"site_admin"`
 }
 
-// Author is a more advanced user that has a separate name and username.
+// Author is a commit author.
 type Author struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
