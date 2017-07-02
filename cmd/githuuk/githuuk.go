@@ -45,15 +45,12 @@ func main() {
 	server.AsyncListenAndServe()
 
 	for rawEvent := range server.Events {
-		switch rawEvent.GetType() {
-		case githuuk.EventPush:
-			evt := rawEvent.(*githuuk.PushEvent)
+		switch evt := rawEvent.(type) {
+		case *githuuk.PushEvent:
 			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
-		case githuuk.EventPullRequest:
-			evt := rawEvent.(*githuuk.PullRequestEvent)
+		case *githuuk.PullRequestEvent:
 			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Action, evt.NumberOfChanges)
-		case githuuk.EventPing:
-			evt := rawEvent.(*githuuk.PingEvent)
+		case *githuuk.PingEvent:
 			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Hook.Name, evt.Hook.ID)
 		default:
 			fmt.Println("Unknown event type", rawEvent.GetType())
