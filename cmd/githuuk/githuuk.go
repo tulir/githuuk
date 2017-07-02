@@ -49,14 +49,18 @@ func main() {
 		switch evt := rawEvent.(type) {
 		case *githuuk.PushEvent:
 			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
+			fmt.Printf("%s pushed %d commits to %s branch %s\n", evt.Sender.Login, len(evt.Commits), evt.Repository.FullName, evt.Ref.Name())
 		case *githuuk.PullRequestEvent:
-			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Action, evt.NumberOfChanges)
+			fmt.Printf("%s %s a pull request with %d changes in %s\n", evt.Sender.Login, evt.Action, evt.NumberOfChanges, evt.Repository.FullName)
 		case *githuuk.PingEvent:
-			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Hook.Name, evt.Hook.ID)
+			fmt.Printf("Ping received for %s hook %s\n", evt.Repository.FullName, evt.Hook.Name)
+		case *githuuk.CreateEvent:
+			fmt.Printf("%s created %s %s in %s\n", evt.Sender.Login, evt.RefType, evt.Ref.Name(), evt.Repository.FullName)
+		case *githuuk.DeleteEvent:
+			fmt.Printf("%s deleted %s %s in %s\n", evt.Sender.Login, evt.RefType, evt.Ref.Name(), evt.Repository.FullName)
 		default:
-			fmt.Println("Unknown event type", rawEvent.GetType())
 			data, _ := json.MarshalIndent(rawEvent, "", "  ")
-			fmt.Println(string(data))
+			fmt.Printf("Unknown event type: %s. Data: %s\n", rawEvent.GetType(), string(data))
 		}
 	}
 }
