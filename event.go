@@ -37,6 +37,7 @@ type Event interface {
 type BaseEvent struct {
 	Type       EventType  `json:"-"`
 	Repository Repository `json:"repository"`
+	Sender     User       `json:"sender"`
 }
 
 // GetType returns the type of this event.
@@ -66,4 +67,20 @@ type PullRequestEvent struct {
 	BaseEvent
 	Action          string `json:"action"`
 	NumberOfChanges int    `json:"number"`
+}
+
+// CreateEvent contains the data in a create (branch/tag) webhook event.
+type CreateEvent struct {
+	BaseEvent
+	Type         ReferenceType `json:"ref_type"`
+	Ref          Reference     `json:"ref"`
+	MasterBranch string        `json:"master_branch"`
+	Description  string        `json:"description"`
+}
+
+// DeleteEvent contains the data in a delete (branch/tag) webhook event.
+type DeleteEvent struct {
+	BaseEvent
+	Type ReferenceType `json:"ref_type"`
+	Ref  Reference     `json:"ref"`
 }

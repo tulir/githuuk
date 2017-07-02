@@ -136,13 +136,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // ParseEvent parses a JSON body into an event struct of the given type.
 func (s *Server) ParseEvent(eventType EventType, body []byte) (Event, int, error) {
 	var event Event
-	if eventType == EventPush {
-		event = &PushEvent{}
-	} else if eventType == EventPullRequest {
-		event = &PullRequestEvent{}
-	} else if eventType == EventPing {
-		event = &PingEvent{}
-	} else {
+	base := BaseEvent{Type: eventType}
+	switch eventType {
+	case EventPush:
+		event = &PushEvent{BaseEvent: base}
+	case EventPullRequest:
+		event = &PullRequestEvent{BaseEvent: base}
+	case EventPing:
+		event = &PingEvent{BaseEvent: base}
+	case EventCreate:
+		event = &CreateEvent{BaseEvent: base}
+	case EventDelete:
+		event = &DeleteEvent{BaseEvent: base}
+	default:
 		return nil, http.StatusNotImplemented, fmt.Errorf("501 Not Implemented - Unknown event type %s", eventType)
 	}
 	err := json.Unmarshal(body, event)

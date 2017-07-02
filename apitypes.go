@@ -41,6 +41,16 @@ func (ref Reference) Name() string {
 	return string(ref)
 }
 
+// ReferenceType tells what kind of a reference was created/edited/deleted.
+type ReferenceType string
+
+// Possible reference types
+const (
+	ReferenceTypeRepository = "repository"
+	ReferenceTypeBranch     = "branch"
+	ReferenceTypeTag        = "tag"
+)
+
 // Repository is a webhook repository.
 type Repository struct {
 	ID            int    `json:"id"`
