@@ -15,7 +15,7 @@ func main() {
 	for rawEvent := range server.Events {
 		switch rawEvent.GetType() {
 		case githuuk.EventPush:
-			evt := rawEvent.(githuuk.PushEvent)
+			evt := rawEvent.(*githuuk.PushEvent)
 			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
 		}
 	}
