@@ -138,18 +138,16 @@ func (s *Server) ParseEvent(eventType EventType, body []byte) (Event, int, error
 	var event Event
 	if eventType == EventPush {
 		event = &PushEvent{}
-		err := json.Unmarshal(body, event)
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
 	} else if eventType == EventPullRequest {
 		event = &PullRequestEvent{}
-		err := json.Unmarshal(body, event)
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
+	} else if eventType == EventPing {
+		event = &PingEvent{}
 	} else {
 		return nil, http.StatusNotImplemented, fmt.Errorf("501 Not Implemented - Unknown event type %s", eventType)
+	}
+	err := json.Unmarshal(body, event)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
 	}
 	return event, http.StatusOK, nil
 }
