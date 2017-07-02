@@ -32,7 +32,7 @@ var Version = "0.1.0"
 // Server is the main server container.
 type Server struct {
 	Host     string
-	Port     int
+	Port     uint8
 	Path     string
 	PingPath string
 	Secret   string
