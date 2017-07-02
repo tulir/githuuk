@@ -7,13 +7,17 @@ This project was originally a fork of [phayes/hookserve](https://github.com/phay
 import "maunium.net/go/githuuk"
 
 func main() {
-  server := githuuk.NewServer()
-  server.Port = 8888
-  server.Secret = "GitHub webhook secret"
-  server.AsyncListenAndServe()
+	server := githuuk.NewServer()
+	server.Port = 8888
+	server.Secret = "GitHub webhook secret"
+	server.AsyncListenAndServe()
 
-  for event := range server.Events {
-
-  }
+	for rawEvent := range server.Events {
+		switch rawEvent.GetType() {
+		case githuuk.EventPush:
+			evt := rawEvent.(githuuk.PushEvent)
+			fmt.Println(evt.Repository.Owner.Name, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
+		}
+	}
 }
 ```

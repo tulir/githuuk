@@ -96,3 +96,17 @@ type PullRequest struct {
 
 	MergeCommitHash string `json:"merge_commit_sha"`
 }
+
+// Hook contains the metadata for Github webhooks. Used in ping hooks.
+type Hook struct {
+	ID     int      `json:"id"`
+	Name   string   `json:"name"`
+	Events []string `json:"events"`
+	Active bool     `json:"active"`
+	Config struct {
+		URL         string `json:"url"`
+		ContentType string `json:"content_Type"`
+	}
+	UpdatedAt string `json:"updated_at"`
+	CreatedAt string `json:"created_at"`
+}

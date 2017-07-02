@@ -71,20 +71,20 @@ func (s *Server) AsyncListenAndServe() {
 
 // CheckSignature checks that the request is from GitHub.
 func (s *Server) CheckSignature(w http.ResponseWriter, r *http.Request, body []byte) bool {
-	if s.Secret != "" {
+	if len(s.Secret) > 0 {
 		sig := r.Header.Get("X-Hub-Signature")
 
-		if sig == "" {
-			http.Error(w, "403 Forbidden - Missing X-Hub-Signature required for HMAC verification", http.StatusForbidden)
+		if len(sig) == 0 {
+			http.Error(w, "Forbidden - Missing X-Hub-Signature", http.StatusForbidden)
 			return false
 		}
 
 		mac := hmac.New(sha1.New, []byte(s.Secret))
 		mac.Write(body)
 		expectedMAC := mac.Sum(nil)
-		expectedSig := "sha1=" + hex.EncodeToString(expectedMAC)
+		expectedSig := fmt.Sprintf("sha1=%s", hex.EncodeToString(expectedMAC))
 		if !hmac.Equal([]byte(expectedSig), []byte(sig)) {
-			http.Error(w, "403 Forbidden - HMAC verification failed", http.StatusForbidden)
+			http.Error(w, "Forbidden - X-Hub-Signature verification failed", http.StatusForbidden)
 			return false
 		}
 	}
@@ -96,19 +96,19 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if r.Method == "GET" && r.URL.Path == s.PingPath {
-		w.Write([]byte("200 OK"))
+		w.Write([]byte("OK"))
 		return
 	} else if r.URL.Path != s.Path {
-		http.Error(w, "404 Not Found", http.StatusNotFound)
+		http.Error(w, "Not Found", http.StatusNotFound)
 		return
 	} else if r.Method != "POST" {
-		http.Error(w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	eventType := EventType(r.Header.Get("X-GitHub-Event"))
 	if eventType == "" {
-		http.Error(w, "400 Bad Request - Missing X-GitHub-Event Header", http.StatusBadRequest)
+		http.Error(w, "Bad Request - Missing X-GitHub-Event Header", http.StatusBadRequest)
 		return
 	}
 
@@ -122,27 +122,34 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var event Event
-	if eventType == EventPush {
-		event = PushEvent{}
-		err = json.Unmarshal(body, &event)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else if eventType == EventPullRequest {
-		event = PullRequestEvent{}
-		err = json.Unmarshal(body, &event)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else {
-		http.Error(w, fmt.Sprintf("501 Not Implemented - Unknown event type %s", eventType), http.StatusNotImplemented)
+	event, status, err := s.ParseEvent(eventType, body)
+	if err != nil {
+		http.Error(w, err.Error(), status)
 		return
 	}
 	s.Events <- event
 
-	w.Header().Set("Server", "hookserve/"+Version)
+	w.Header().Set("Server", fmt.Sprintf("githuuk/%s", Version))
 	w.Write([]byte("{}"))
+}
+
+// ParseEvent parses a JSON body into an event struct of the given type.
+func (s *Server) ParseEvent(eventType EventType, body []byte) (Event, int, error) {
+	var event Event
+	if eventType == EventPush {
+		event = &PushEvent{}
+		err := json.Unmarshal(body, event)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+	} else if eventType == EventPullRequest {
+		event = &PullRequestEvent{}
+		err := json.Unmarshal(body, event)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+	} else {
+		return nil, http.StatusNotImplemented, fmt.Errorf("501 Not Implemented - Unknown event type %s", eventType)
+	}
+	return event, http.StatusOK, nil
 }

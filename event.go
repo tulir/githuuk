@@ -25,6 +25,7 @@ const (
 	EventPullRequest EventType = "pull_request"
 	EventCreate      EventType = "create"
 	EventDelete      EventType = "delete"
+	EventPing        EventType = "ping"
 )
 
 // Event is an abstract event.
@@ -39,8 +40,16 @@ type BaseEvent struct {
 }
 
 // GetType returns the type of this event.
-func (evt BaseEvent) GetType() EventType {
+func (evt *BaseEvent) GetType() EventType {
 	return evt.Type
+}
+
+// PingEvent contains the data for the webhook creation ping.
+type PingEvent struct {
+	BaseEvent
+	Zen    string `json:"zen"`
+	HookID int    `json:"hook_id"`
+	Hook   Hook   `json:"hook"`
 }
 
 // PushEvent contains the data in a push-type webhook event.
