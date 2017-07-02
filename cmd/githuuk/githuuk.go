@@ -23,7 +23,7 @@ import (
 	flag "maunium.net/go/mauflag"
 )
 
-var port = flag.MakeFull("p", "port", "The port on which to listen for GitHub webhooks.", "80").Uint8()
+var port = flag.MakeFull("p", "port", "The port on which to listen for GitHub webhooks.", "80").Uint16()
 var secret = flag.MakeFull("s", "secret", "The GitHub webhook secret.", "").String()
 var wantHelp, _ = flag.MakeHelpFlag()
 
