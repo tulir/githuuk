@@ -48,7 +48,6 @@ func main() {
 	for rawEvent := range server.Events {
 		switch evt := rawEvent.(type) {
 		case *githuuk.PushEvent:
-			fmt.Println(evt.Repository.Owner.Login, evt.Repository.Name, evt.Ref.Name(), evt.HeadCommit.ID)
 			fmt.Printf("%s pushed %d commits to %s branch %s\n", evt.Sender.Login, len(evt.Commits), evt.Repository.FullName, evt.Ref.Name())
 		case *githuuk.PullRequestEvent:
 			fmt.Printf("%s %s a pull request with %d changes in %s\n", evt.Sender.Login, evt.Action, evt.NumberOfChanges, evt.Repository.FullName)
