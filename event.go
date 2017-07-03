@@ -60,6 +60,9 @@ type PushEvent struct {
 	HeadCommit Commit    `json:"head_commit"`
 	Ref        Reference `json:"ref"`
 	Pusher     User      `json:"pusher"`
+	Deleted    bool      `json:"deleted"`
+	Created    bool      `json:"created"`
+	Forced     bool      `json:"forced"`
 }
 
 // PullRequestEvent contains the data in a pull_request-type webhook event.
